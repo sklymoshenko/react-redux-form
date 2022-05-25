@@ -2,6 +2,7 @@
   width: 30%;
   margin-inline: auto;
   height: 200px;
+  margin-bottom: 60px;
 }
 
 .main-form {
@@ -16,6 +17,10 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.main-form-file-upload {
+  margin-top: 27px;
 }
 
 .input-item {
