@@ -3,6 +3,7 @@ import { Input, Button, InputNumber, message } from 'antd';
 import "./MainForm.css";
 import { Field, reduxForm, InjectedFormProps, WrappedFieldProps, WrappedFieldMetaProps } from 'redux-form'
 import { acceptOnlyNumber, maxFileSize, numberRange, required } from "./validations";
+import { getUploadId, IUploadIdPayload } from "../../services/api";
 
 
 const errorMessage = (meta: WrappedFieldMetaProps): JSX.Element | null => {
@@ -38,7 +39,7 @@ const renderFileUpload = (props: WrappedFieldProps & WrappedFieldMetaProps): JSX
 
   // values is actually typed as any o_0
   // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/9ce52af612e29ff0bac4317bde78d0acab29afdb/types/redux-form/v6/lib/Form.d.ts#L5
-  const onSubmit = (values: any) => {
+  const onSubmit = async (values: IUploadIdPayload & { uploadFle: string }): Promise<void> => {
     const fileInput: HTMLInputElement | null = document.querySelector('input[type=file]')
     const file = fileInput?.files?.[0]
 
@@ -47,6 +48,9 @@ const renderFileUpload = (props: WrappedFieldProps & WrappedFieldMetaProps): JSX
       message.error(notValidFile)
       return
     }
+
+    const uploadId = await getUploadId({name: values.name, height: +values.height })
+    debugger
   }
 
 const MainForm: React.FC = (props) => {
@@ -67,7 +71,7 @@ const MainForm: React.FC = (props) => {
             </div>
           </div>
           <div className="main-form-file-upload">
-          <Field name="file" component={renderFileUpload} type="file" validate={[required]}/>
+          <Field name="uploadFle" component={renderFileUpload} type="file" validate={[required]}/>
           </div>
         </div>
         <Button type="primary" block htmlType="submit" disabled={!valid}>
