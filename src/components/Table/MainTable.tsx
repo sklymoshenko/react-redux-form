@@ -38,7 +38,11 @@ const columns: ColumnsType<ITableItem> = [
 ];
 
 const MainTable: React.FC = () => {
-  const data = useSelector(selectItems)
+  let data = useSelector(selectItems)
+
+  // Add a uniquie key for table
+  data = data.map((item, i) => ({...item, key: i }))
+
   return <Table columns={columns} dataSource={data} />;
 }
 
