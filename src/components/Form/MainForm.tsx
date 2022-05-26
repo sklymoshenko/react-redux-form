@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Input, Button, InputNumber, message } from 'antd';
 import "./MainForm.css";
 import { Field, reduxForm, InjectedFormProps, WrappedFieldProps, WrappedFieldMetaProps, reset } from 'redux-form'
 import { acceptOnlyNumber, maxFileSize, numberRange, required } from "./validations";
-import { getUploadedFiles, IUploadIdPayload, uploadFile } from "../../services/api";
+import { getUploadedFiles, uploadFile } from "../../services/api";
 import { store } from "../../state/store";
 import { setItems } from "../../state/reducers/tableReducer";
 
@@ -44,32 +44,37 @@ const resetForm = (fileInput: HTMLInputElement) => {
   fileInput!.value = ''
 }
 
-const onSubmit = async (values: IUploadIdPayload & { uploadFle: string }): Promise<void> => {
-  const fileInput: HTMLInputElement = document.querySelector('input[type=file]')!
-  const file = fileInput!.files![0]
-  let formData = new FormData();
-  formData.append("file", file)
-
-  const notValidFile = maxFileSize(file)
-  if (notValidFile) {
-    message.error(notValidFile)
-    return
-  }
-
-  await uploadFile({name: values.name, height: +values.height }, formData)
-  message.success('File is uploaded successfully!')
-
-  const newItems = await getUploadedFiles()
-  store.dispatch(setItems(newItems))
-
-  resetForm(fileInput)
-}
-
 const MainForm: React.FC = (props) => {
   const { handleSubmit, valid } = props as InjectedFormProps
+  const [loading, setLoading] = useState(false)
+
+  // values is actually typed as any o_0
+  // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/9ce52af612e29ff0bac4317bde78d0acab29afdb/types/redux-form/v6/lib/Form.d.ts#L5
+  const onSubmit = async (values: any) => {
+    const fileInput: HTMLInputElement = document.querySelector('input[type=file]')!
+    const file = fileInput!.files![0]
+    let formData = new FormData();
+    formData.append("file", file)
+
+    const notValidFile = maxFileSize(file)
+    if (notValidFile) {
+      message.error(notValidFile)
+      return
+    }
+
+    setLoading(() => true)
+    await uploadFile({name: values.name, height: +values.height }, formData)
+    message.success('File is uploaded successfully!')
+    setLoading(() => false)
+
+    const newItems = await getUploadedFiles()
+    store.dispatch(setItems(newItems))
+
+    resetForm(fileInput)
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit).bind(this)}>
       <div className="main-form-wrapper">
         <div className="main-form">
           <div className="main-form-inputs">
@@ -86,7 +91,7 @@ const MainForm: React.FC = (props) => {
           <Field name="uploadFle" component={renderFileUpload} type="file" validate={[required]}/>
           </div>
         </div>
-        <Button type="primary" block htmlType="submit" disabled={!valid}>
+        <Button type="primary" block htmlType="submit" disabled={!valid} loading={loading}>
           Submit
         </Button>
       </div>
@@ -95,6 +100,5 @@ const MainForm: React.FC = (props) => {
 }
 
 export default reduxForm({
-  form: 'filedata',
-  onSubmit,
+  form: 'filedata'
 })(MainForm)
