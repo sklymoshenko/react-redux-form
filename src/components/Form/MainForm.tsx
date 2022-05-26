@@ -9,21 +9,21 @@ import { setItems } from "../../state/reducers/tableReducer";
 
 
 const errorMessage = (meta: WrappedFieldMetaProps): JSX.Element | null => {
-  return (meta && meta.invalid && meta.error && meta.touched && <span className="error-message">{meta.error}</span>)
+  return (meta && meta.invalid && meta.error && meta.touched && <span className="error-message" data-testid="input-error-message">{meta.error}</span>)
 }
 
 // Custom inputs for styling purposes
 const renderNameInput = (props: WrappedFieldProps & WrappedFieldMetaProps): JSX.Element => {
   return (
     <div>
-      <Input size="large" {...props.input } status={props.meta.error && props.meta.touched ? "error" : ''} maxLength={100}/>
+      <Input size="large" {...props.input } status={props.meta.error && props.meta.touched ? "error" : ''} maxLength={100} data-testid="input-name"/>
       {errorMessage(props.meta)}
     </div>
   )
 }
 const renderHeightInput = (props: WrappedFieldProps & WrappedFieldMetaProps): JSX.Element => {
   return (<div>
-    <InputNumber size="large" {...props.input } max={500} min={0} style={{ width: '100%' }} status={props.meta.error && props.meta.touched ? "error" : ''}/>
+    <InputNumber size="large" {...props.input } max={500} min={0} style={{ width: '100%' }} status={props.meta.error && props.meta.touched ? "error" : ''} data-testid="input-height"/>
     {errorMessage(props.meta)}
   </div>
   )
@@ -34,12 +34,12 @@ const renderFileUpload = (props: WrappedFieldProps & WrappedFieldMetaProps): JSX
     <input type="file" onChange={(e) => {
       e.preventDefault()
       props.input.onChange(e.target.files![0].name)
-    }} />
+    }} data-testid="file-upload" />
   </div>
   )
 }
 
-const resetForm = (fileInput: HTMLInputElement) => {
+export const resetForm = (fileInput: HTMLInputElement) => {
   store.dispatch(reset("filedata"))
   fileInput!.value = ''
 }
@@ -79,8 +79,8 @@ const MainForm: React.FC = (props) => {
         <div className="main-form">
           <div className="main-form-inputs">
             <div className="name-input input-item">
-              <label htmlFor="name" >Name <span className="required-star">*</span></label>
-              <Field name="name" component={renderNameInput} type="text" validate={required}/>
+              <label htmlFor="Name" >Name <span className="required-star">*</span></label>
+              <Field name="name" component={renderNameInput} type="text" validate={required} />
             </div>
             <div className="height-input input-item">
               <label htmlFor="height" >Height <span className="required-star">*</span></label>

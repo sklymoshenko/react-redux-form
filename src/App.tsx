@@ -7,8 +7,8 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <div className="container">
-        <MainForm></MainForm>
-        <MainTable></MainTable>
+        <MainForm />
+        <MainTable />
       </div>
     </div>
   );
