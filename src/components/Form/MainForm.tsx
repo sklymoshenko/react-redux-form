@@ -4,6 +4,8 @@ import "./MainForm.css";
 import { Field, reduxForm, InjectedFormProps, WrappedFieldProps, WrappedFieldMetaProps } from 'redux-form'
 import { acceptOnlyNumber, maxFileSize, numberRange, required } from "./validations";
 import { getUploadedFiles, IUploadIdPayload, uploadFile } from "../../services/api";
+import { store } from "../../state/store";
+import { setItems } from "../../state/reducers/tableReducer";
 
 
 const errorMessage = (meta: WrappedFieldMetaProps): JSX.Element | null => {
@@ -37,8 +39,6 @@ const renderFileUpload = (props: WrappedFieldProps & WrappedFieldMetaProps): JSX
   )
 }
 
-  // values is actually typed as any o_0
-  // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/9ce52af612e29ff0bac4317bde78d0acab29afdb/types/redux-form/v6/lib/Form.d.ts#L5
   const onSubmit = async (values: IUploadIdPayload & { uploadFle: string }): Promise<void> => {
     const fileInput: HTMLInputElement | null = document.querySelector('input[type=file]')
     const file = fileInput!.files![0]
@@ -54,7 +54,8 @@ const renderFileUpload = (props: WrappedFieldProps & WrappedFieldMetaProps): JSX
     await uploadFile({name: values.name, height: +values.height }, formData)
     message.success('File is uploaded successfully!')
 
-    await getUploadedFiles()
+    const newItems = await getUploadedFiles()
+    store.dispatch(setItems(newItems))
   }
 
 const MainForm: React.FC = (props) => {

@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { reducer as formReducer } from "redux-form";
+import tableReducer from "./reducers/tableReducer";
 
 export const store = configureStore({
   reducer: {
-    form: formReducer
+    form: formReducer,
+    table: tableReducer
   }
 });
 

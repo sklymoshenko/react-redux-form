@@ -1,8 +1,4 @@
-export interface ITableItem {
-  name: string;
-  height: number;
-  file: string;
-}
+import { ITableItem } from "@/state/reducers/tableReducer";
 
 export interface IUploadIdPayload {
   name: ITableItem["name"];

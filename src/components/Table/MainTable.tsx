@@ -1,14 +1,25 @@
 import React from 'react';
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/lib/table';
+import { ITableItem, setItems,selectItems } from '../../state/reducers/tableReducer';
+import { store } from '../../state/store';
+import { getUploadedFiles } from '../../services/api';
+import { useSelector } from 'react-redux';
 
-interface DataType {
-  key: string;
-  name: string;
-  height: number;
+async function setItemsIntoStore(): Promise<void> {
+  const items = await getUploadedFiles()
+  store.dispatch(setItems(items))
 }
 
-const columns: ColumnsType<DataType> = [
+
+setInterval(async () => {
+  await setItemsIntoStore()
+}, 10000)
+
+setItemsIntoStore()
+
+
+const columns: ColumnsType<ITableItem> = [
   {
     title: 'Name',
     dataIndex: 'name',
@@ -19,26 +30,16 @@ const columns: ColumnsType<DataType> = [
     dataIndex: 'height',
     key: 'height',
   },
-];
-
-const data: DataType[] = [
   {
-    key: '1',
-    name: 'John Brown',
-    height: 32,
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    height: 42,
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    height: 32,
+    title: 'File',
+    dataIndex: 'file',
+    key: 'file',
   },
 ];
 
-const MainTable: React.FC = () => <Table columns={columns} dataSource={data} />;
+const MainTable: React.FC = () => {
+  const data = useSelector(selectItems)
+  return <Table columns={columns} dataSource={data} />;
+}
 
 export default MainTable;
