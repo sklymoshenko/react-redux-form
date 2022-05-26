@@ -8,7 +8,7 @@ export interface IUploadIdResp {
 }
 
 export const getUploadId = async (payload: IUploadIdPayload) => {
-  const response = await fetch("http://my-app-yikvv.ondigitalocean.app/submit", {
+  const response = await fetch("https://my-app-yikvv.ondigitalocean.app/submit", {
     body: JSON.stringify(payload),
     method: "POST",
     headers: new Headers({
