@@ -3,7 +3,7 @@ import { Input, Button, InputNumber, message } from 'antd';
 import "./MainForm.css";
 import { Field, reduxForm, InjectedFormProps, WrappedFieldProps, WrappedFieldMetaProps } from 'redux-form'
 import { acceptOnlyNumber, maxFileSize, numberRange, required } from "./validations";
-import { getUploadId, IUploadIdPayload } from "../../services/api";
+import { getUploadedFiles, IUploadIdPayload, uploadFile } from "../../services/api";
 
 
 const errorMessage = (meta: WrappedFieldMetaProps): JSX.Element | null => {
@@ -41,7 +41,9 @@ const renderFileUpload = (props: WrappedFieldProps & WrappedFieldMetaProps): JSX
   // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/9ce52af612e29ff0bac4317bde78d0acab29afdb/types/redux-form/v6/lib/Form.d.ts#L5
   const onSubmit = async (values: IUploadIdPayload & { uploadFle: string }): Promise<void> => {
     const fileInput: HTMLInputElement | null = document.querySelector('input[type=file]')
-    const file = fileInput?.files?.[0]
+    const file = fileInput!.files![0]
+    let formData = new FormData();
+    formData.append("file", file)
 
     const notValidFile = maxFileSize(file)
     if (notValidFile) {
@@ -49,8 +51,10 @@ const renderFileUpload = (props: WrappedFieldProps & WrappedFieldMetaProps): JSX
       return
     }
 
-    const uploadId = await getUploadId({name: values.name, height: +values.height })
-    debugger
+    await uploadFile({name: values.name, height: +values.height }, formData)
+    message.success('File is uploaded successfully!')
+
+    await getUploadedFiles()
   }
 
 const MainForm: React.FC = (props) => {
